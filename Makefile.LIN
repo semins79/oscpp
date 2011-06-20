@@ -1,0 +1,88 @@
+CUDA_DIR=/usr/local/cuda
+
+CC=g++
+CCFLAGS=-I include -c -g -rdynamic
+LDLFAGS=-g -rdynamic
+AR=ar cvr
+
+.SUFFIXES: .cpp .o
+
+CRT_CPP_SRC=                    \
+src/AsyncFileReader.cpp         \
+src/AsyncIORequest.cpp          \
+src/Checkpointer.cpp            \
+src/Condition.cpp               \
+src/Closure.cpp                 \
+src/GenericAsyncIORequest.cpp   \
+src/Mutex.cpp                   \
+src/Runnable.cpp                \
+src/Thread.cpp                  \
+src/Timer.cpp                   \
+src/Win32AsyncIORequest.cpp     \
+
+CRT_CPP_OBJ=                    \
+obj/AsyncFileReader.o           \
+obj/AsyncIORequest.o            \
+obj/Checkpointer.o              \
+obj/Closure.o                   \
+obj/Condition.o                 \
+obj/GenericAsyncIORequest.o     \
+obj/Mutex.o                     \
+obj/Runnable.o                  \
+obj/Thread.o                    \
+obj/Timer.o                     \
+obj/Win32AsyncIORequest.o       \
+
+LIB_OUTPUT=lib/liboscpp.a
+
+TESTS=                    \
+bin/AsyncFileReaderTest   \
+
+CRT_OBJ=$(CRT_CPP_OBJ)
+
+all: $(LIB_OUTPUT) $(TESTS)
+
+$(LIB_OUTPUT): $(CRT_OBJ)
+	$(AR) $(LIB_OUTPUT) $(CRT_OBJ)
+
+bin/AsyncFileReaderTest: lib/liboscpp.a obj/AsyncFileReaderTest.o
+	$(CC) $(LDFLAGS) obj/AsyncFileReaderTest.o -o bin/AsyncFileReaderTest -L lib -L $(CUDA_DIR)/lib64 -loscpp -lcudart
+
+obj/AsyncFileReaderTest.o: test/AsyncFileReaderTest.cpp lib/liboscpp.a
+	$(CC) $(CCFLAGS) -I $(CUDA_DIR)/include test/AsyncFileReaderTest.cpp -c -o obj/AsyncFileReaderTest.o
+
+obj/AsyncFileReader.o: src/AsyncFileReader.cpp include/oscpp/AsyncFileReader.h
+	$(CC) $(CCFLAGS) src/AsyncFileReader.cpp -c -o obj/AsyncFileReader.o
+
+obj/AsyncIORequest.o: src/AsyncIORequest.cpp include/oscpp/AsyncIORequest.h
+	$(CC) $(CCFLAGS) src/AsyncIORequest.cpp -c -o obj/AsyncIORequest.o
+
+obj/Checkpointer.o: src/Checkpointer.cpp include/oscpp/Checkpointer.h
+	$(CC) $(CCFLAGS) src/Checkpointer.cpp -c -o obj/Checkpointer.o
+
+obj/Closure.o: src/Closure.cpp include/oscpp/Closure.h
+	$(CC) $(CCFLAGS) src/Closure.cpp -c -o obj/Closure.o
+
+obj/Condition.o: src/Condition.cpp include/oscpp/Condition.h
+	$(CC) $(CCFLAGS) src/Condition.cpp -c -o obj/Condition.o
+
+obj/GenericAsyncIORequest.o: src/GenericAsyncIORequest.cpp include/oscpp/GenericAsyncIORequest.h
+	$(CC) $(CCFLAGS) src/GenericAsyncIORequest.cpp -c -o obj/GenericAsyncIORequest.o
+
+obj/Mutex.o: src/Mutex.cpp include/oscpp/Mutex.h
+	$(CC) $(CCFLAGS) src/Mutex.cpp -c -o obj/Mutex.o
+
+obj/Runnable.o: src/Runnable.cpp include/oscpp/Runnable.h
+	$(CC) $(CCFLAGS) src/Runnable.cpp -c -o obj/Runnable.o
+
+obj/Thread.o: src/Thread.cpp include/oscpp/Thread.h
+	$(CC) $(CCFLAGS) src/Thread.cpp -c -o obj/Thread.o
+
+obj/Timer.o: src/Timer.cpp include/oscpp/Timer.h
+	$(CC) $(CCFLAGS) src/Timer.cpp -c -o obj/Timer.o
+
+obj/Win32AsyncIORequest.o: src/Win32AsyncIORequest.cpp include/oscpp/Win32AsyncIORequest.h
+	$(CC) $(CCFLAGS) src/Win32AsyncIORequest.cpp -c -o obj/Win32AsyncIORequest.o
+
+clean:
+	rm -rvf *.ilk *.pdb *.ncb *.sln *.idb *.linkinfo obj/* lib/* bin/*
