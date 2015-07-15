@@ -1,0 +1,1 @@
+A simple class library for the basic operating-system primitives such as mutexes, threads, etc.
